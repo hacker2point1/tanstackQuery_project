@@ -1,16 +1,28 @@
+
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist, Geist_Mono, Montserrat } from "next/font/google";
 import "./globals.css";
 import QueryProvider from "@/providers/tanstack-query-provider";
+import LayoutWrapper from "@/components/common/layoutWrapper";
+import ReactQueryProvider from "@/providers/tanstack-query-provider";
+// import { CookiesProvider } from "react-cookie";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+// const geistSans = Geist({
+//   variable: "--font-geist-sans",
+//   subsets: ["latin"],
+// });
+
+// const geistMono = Geist_Mono({
+//   variable: "--font-geist-mono",
+//   subsets: ["latin"],
+// });
+
+const montserrat = Montserrat({
+  variable: "--font-montserrat",
   subsets: ["latin"],
+  weight: ["300", "400", "500", "600", "700", "800"],
+  
 });
 
 export const metadata: Metadata = {
@@ -26,10 +38,15 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${montserrat.variable} ${montserrat.variable} antialiased`}
       >
-        <QueryProvider>{children}</QueryProvider>
-        
+        <main style={{ marginLeft: 0 }}>
+          <ReactQueryProvider>
+          <LayoutWrapper>
+          <QueryProvider>{children}</QueryProvider>
+          </LayoutWrapper>
+          </ReactQueryProvider>
+        </main>
       </body>
     </html>
   );

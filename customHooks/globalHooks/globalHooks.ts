@@ -5,7 +5,7 @@ interface GlobalHooks {
 }
 
 //this is a global custom hooks
-//
+
 export const useGlobalHooks = ():GlobalHooks=>{
     const queryClient = useQueryClient()
 
