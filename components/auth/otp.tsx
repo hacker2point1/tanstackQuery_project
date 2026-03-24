@@ -1,90 +1,18 @@
-// "use client"
-
-// import { useOtpMutation } from "@/customHooks/query/auth.query.hooks";
-// import { useForm } from "react-hook-form"
-// import styles from "../auth/otp.module.css"
-
-// const Otp: React.FC = () => {
-
-//   const userId =
-//     typeof window !== "undefined" ? localStorage.getItem("userId") : null;
-
-//   const email =
-//     typeof window !== "undefined" ? localStorage.getItem("email") : null;
-
-//   const { handleSubmit } = useForm();
-//   const { mutate, isPending } = useOtpMutation();
-
-//   const handleChange = (e: any, index: number) => {
-//     const value = e.target.value.replace(/\D/g, "").slice(-1);
-//     e.target.value = value;
-
-//     if (value) {
-//       const next = document.getElementById(`otp-${index + 1}`);
-//       if (next) next.focus();
-//     }
-//   };
-
-//   const onSubmit = () => {
-//     let otpValue = "";
-
-//     for (let i = 0; i < 6; i++) {
-//       const box = document.getElementById(`otp-${i}`) as HTMLInputElement;
-//       if (box) otpValue += box.value;
-//     }
-
-//     const data = {
-//       userId,
-//       otp: otpValue,
-//     };
-
-//     mutate(data);
-//   };
-
-//   return (
-//   <div className={styles.container}>
-//     <div className={styles.card}>
-//       <h2 className={styles.title}>OTP Verification</h2>
-
-//       <p className={styles.subtitle}>
-//         OTP sent to <strong>{email}</strong>
-//       </p>
-
-//       <form onSubmit={handleSubmit(onSubmit)}>
-//         <div className={styles.otpWrapper}>
-//           {Array.from({ length: 6 }).map((_, index) => (
-//             <input
-//               key={index}
-//               id={`otp-${index}`}
-//               type="text"
-//               maxLength={1}
-//               onChange={(e) => handleChange(e, index)}
-//               className={styles.otpInput}
-//             />
-//           ))}
-//         </div>
-
-//         <button
-//           type="submit"
-//           disabled={isPending}
-//           className={styles.button}
-//         >
-//           {isPending ? "Verifying..." : "Verify OTP"}
-//         </button>
-//       </form>
-//     </div>
-//   </div>
-// );
-// };
-
-// export default Otp;
-
 "use client";
 
 import { useOtpMutation } from "@/customHooks/query/auth.query.hooks";
 import { useForm } from "react-hook-form";
 import { useRef } from "react";
-import styles from "../auth/otp.module.css";
+import { toast } from "sonner";
+
+import {
+  Box,
+  Typography,
+  Paper,
+  Stack,
+  TextField,
+  Button,
+} from "@mui/material";
 
 const Otp: React.FC<{
   onClose?: () => void;
@@ -149,8 +77,14 @@ const Otp: React.FC<{
       .map((input) => input?.value || "")
       .join("");
 
-    const Data = {
-      userId,
+    const uid = userId ?? "";
+    if (!uid) {
+      toast.error("Missing userId, please retry login");
+      return;
+    }
+
+    const Data: any = {
+      userId: uid,
       otp: otpValue,
     };
 
@@ -162,44 +96,100 @@ const Otp: React.FC<{
   };
 
   return (
-    <div className={styles.container}>
-      <div className={styles.card}>
-        <h2 className={styles.title}>OTP Verification</h2>
-
-        <p className={styles.subtitle}>
-          OTP sent to <strong>{email}</strong>
-        </p>
-
-        <form onSubmit={handleSubmit(onSubmit)}>
-          <div className={styles.otpWrapper}>
-            {Array.from({ length: 6 }).map((_, index) => (
-              <input
-                key={index}
-                ref={(el) => (inputsRef.current[index] = el)}
-                type="text"
-                maxLength={1}
-                onChange={(e) => handleChange(e, index)}
-                onKeyDown={(e) => handleKeyDown(e, index)}
-                onPaste={handlePaste}
-                className={styles.otpInput}
-              />
-            ))}
-          </div>
-
-          <button
-            type="submit"
-            disabled={isPending}
-            className={styles.button}
+    <Box
+      sx={{
+        minHeight: "100%",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        px: 2,
+      }}
+    >
+      <Paper
+        elevation={0}
+        sx={{
+          p: 4,
+          borderRadius: "20px",
+          background: "linear-gradient(135deg, #ffffff, #f4f6f8)",
+          width: "100%",
+          maxWidth: 400,
+          textAlign: "center",
+        }}
+      >
+        <Stack spacing={2}>
+          {/* HEADER */}
+          <Typography
+            variant="h5"
+            fontWeight={700}
+            sx={{ color: "#212B36" }}
           >
-            {isPending ? (
-              <span className={styles.spinner}></span>
-            ) : (
-              "Verify OTP"
-            )}
-          </button>
-        </form>
-      </div>
-    </div>
+            OTP Verification
+          </Typography>
+
+          <Typography variant="body2" color="text.secondary">
+            OTP sent to <strong>{email}</strong>
+          </Typography>
+
+          {/* FORM */}
+          <form onSubmit={handleSubmit(onSubmit)}>
+            <Stack spacing={3}>
+              {/* OTP INPUTS */}
+              <Stack direction="row" spacing={1} justifyContent="center">
+                {Array.from({ length: 6 }).map((_, index) => (
+                  <TextField
+                    key={index}
+                    inputRef={(el) => (inputsRef.current[index] = el)}
+                    type="text"
+                    inputProps={{
+                      maxLength: 1,
+                      style: {
+                        textAlign: "center",
+                        fontSize: "18px",
+                        fontWeight: 600,
+                      },
+                    }}
+                    onChange={(e) => handleChange(e, index)}
+                    onKeyDown={(e) => handleKeyDown(e, index)}
+                    onPaste={handlePaste}
+                    sx={{
+                      width: 45,
+                      "& .MuiOutlinedInput-root": {
+                        borderRadius: "10px",
+                        background: "#fff",
+                      },
+                    }}
+                  />
+                ))}
+              </Stack>
+
+              {/* BUTTON */}
+              <Button
+                type="submit"
+                fullWidth
+                disabled={isPending}
+                disableElevation
+                sx={{
+                  height: 45,
+                  borderRadius: "999px",
+                  textTransform: "none",
+                  fontWeight: 600,
+                  background:
+                    "linear-gradient(135deg, #212B36, #000000)",
+                  color: "#fff",
+                  "&:hover": {
+                    background:
+                      "linear-gradient(135deg, #000000, #212B36)",
+                    transform: "translateY(-1px)",
+                  },
+                }}
+              >
+                {isPending ? "Verifying..." : "Verify OTP"}
+              </Button>
+            </Stack>
+          </form>
+        </Stack>
+      </Paper>
+    </Box>
   );
 };
 

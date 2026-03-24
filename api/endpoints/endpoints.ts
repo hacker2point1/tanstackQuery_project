@@ -8,6 +8,7 @@ export const endpoints ={
         history:"/user/history",
         resetLink:"/auth/resetlink",
         resetPassword:"/reset-password",
+        mapLocation:"/diagnostic/nearby"
     },
     doctor:{
         list:"/user/doctor/list",
@@ -16,9 +17,7 @@ export const endpoints ={
            
     },
     
-    // list:{
-    //     searchAndList:"/user/doctor/list"
-    // }
+    
 }
 
 
@@ -30,12 +29,13 @@ export const collectionOfEndpoints:string[]=[
     endpoints.auth.profile,
     endpoints.auth.history,
     endpoints.auth.resetLink,
+    endpoints.auth.mapLocation,
 
 
     //doctor
     endpoints.doctor.list,
     endpoints.doctor.appoinment,
         endpoints.doctor.slots,
-    // endpoints.list.searchAndList
+    
 ]
 

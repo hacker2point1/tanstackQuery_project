@@ -103,7 +103,7 @@ export default function HistoryPage() {
   return (
     <Box sx={{ maxWidth: 1000, mx: "auto", mt: 6, px: 2 }}>
       
-      {/* HEADER */}
+      {/* header */}
       <Typography
         variant="h4"
         sx={{
@@ -154,7 +154,7 @@ export default function HistoryPage() {
             setPage(1);
           }}
           sx={{
-            flex: 1, // 🔥 equal width (IMPORTANT FIX)
+            flex: 1, 
             zIndex: 2,
             py: 1,
             borderRadius: "999px",
@@ -163,7 +163,7 @@ export default function HistoryPage() {
             fontSize: 14,
             display: "flex",
             alignItems: "center",
-            justifyContent: "center", // 🔥 center text
+            justifyContent: "center",
             gap: 1,
             color: active ? "#fff" : "#374151",
             transition: "0.3s",
@@ -192,7 +192,7 @@ export default function HistoryPage() {
   </Box>
 </Box>
 
-      {/* EMPTY */}
+      {/* empty-data */}
       {filteredData.length === 0 && (
         <Box
           sx={{
@@ -212,7 +212,7 @@ export default function HistoryPage() {
         </Box>
       )}
 
-      {/* LIST */}
+      {/* list */}
       <Stack spacing={2}>
         {paginatedData.map((item: any) => {
           const doctor = item?.doctorId || {};
@@ -271,7 +271,7 @@ export default function HistoryPage() {
         })}
       </Stack>
 
-      {/* PAGINATION */}
+      {/* pagination */}
       {filteredData.length > ITEMS_PER_PAGE && (
         <Stack alignItems="center" mt={5}>
           <Pagination
@@ -288,74 +288,3 @@ export default function HistoryPage() {
 }
 
 
-
-// "use client";
-
-// import React from "react";
-// import { Box, Typography, CircularProgress, Alert, Card, CardContent, Stack, Chip } from "@mui/material";
-// import useUserHistory from "@/customHooks/query/history.query.hooks";
-
-// export default function HistoryPage() {
-//   const { data, isLoading, isError, error } = useUserHistory();
-
-//   if (isLoading) {
-//     return (
-//       <Box sx={{ display: "flex", justifyContent: "center", mt: 8 }}>
-//         <CircularProgress />
-//       </Box>
-//     );
-//   }
-
-//   if (isError) {
-//     return (
-//       <Box sx={{ maxWidth: 720, mx: "auto", mt: 8 }}>
-//         <Alert severity="error">{(error as any)?.message || "Failed to load history."}</Alert>
-//       </Box>
-//     );
-//   }
-
-//   const payload = data?.data ?? data;
-//   const history = Array.isArray(payload) ? payload : payload?.data ?? [];
-
-//   return (
-//     <Box sx={{ maxWidth: 980, mx: "auto", mt: 6, px: 2 }}>
-//       <Typography variant="h4" sx={{ mb: 3 }}>
-//         My Appointments
-//       </Typography>
-
-//       <Stack spacing={2}>
-//         {history.length === 0 && <Typography>No appointments found.</Typography>}
-
-//         {history.map((item: any) => {
-//           const doctor = item?.doctorId || {};
-//           return (
-//             <Card key={item._id}>
-//               <CardContent>
-//                 <Stack direction="row" justifyContent="space-between" alignItems="center">
-//                   <Box>
-//                     <Typography variant="h6">{doctor.name || "Unknown Doctor"}</Typography>
-//                     <Typography sx={{ color: "text.secondary" }}>{item.date} {item.time}</Typography>
-//                     <Typography sx={{ color: "text.secondary" }}>{item?.address || ""}</Typography>
-//                   </Box>
-
-//                   <Box sx={{ textAlign: "right" }}>
-//                     <Typography sx={{ mb: 1 }}>₹{doctor.fees ?? "-"}</Typography>
-//                     {(() => {
-//                       const st = (item.status || "").toString().toLowerCase().trim();
-//                       let chipColor: "default" | "primary" | "secondary" | "error" | "info" | "success" | "warning" = "default";
-//                       if (st.includes("confirm") || st.includes("accept")) chipColor = "success";
-//                       else if (st.includes("reject") || st.includes("declin")) chipColor = "error";
-//                       else if (st.includes("pend") || st.includes("wait")) chipColor = "warning";
-
-//                       return <Chip label={item.status || "-"} color={chipColor} />;
-//                     })()}
-//                   </Box>
-//                 </Stack>
-//               </CardContent>
-//             </Card>
-//           );
-//         })}
-//       </Stack>
-//     </Box>
-//   );
-// }

@@ -1,6 +1,7 @@
 "use client";
 
-import { Box, Typography, Grid, useTheme } from "@mui/material";
+import { Box, Typography, useTheme } from "@mui/material";
+import Grid from "@mui/material/Grid";
 import { motion } from "framer-motion";
 
 const features = [
@@ -41,7 +42,7 @@ const WhyChooseUs = () => {
           : "linear-gradient(180deg, #f4f9fc 0%, #ffffff 100%)",
       }}
     >
-      {/* Glow Effects */}
+      {/* Glowing Effects */}
       <Box
         sx={{
           position: "absolute",
@@ -88,8 +89,8 @@ const WhyChooseUs = () => {
       {/* Centered Grid Wrapper */}
       <Box
         sx={{
-          maxWidth: "1100px",   // 👈 controls centering width
-          mx: "auto",          // 👈 centers horizontally
+          maxWidth: "1100px",  
+          mx: "auto",      
         }}
       >
         <motion.div
@@ -100,7 +101,7 @@ const WhyChooseUs = () => {
         >
           <Grid container spacing={4} justifyContent="center">
             {features.map((itemText, i) => (
-              <Grid item xs={12} sm={6} md={3} key={i}>
+              <Grid key={i} {...({ item: true, xs: 12, sm: 6, md: 3 } as any)}>
                 <motion.div variants={item}>
                   <Box
                     sx={{

@@ -5,18 +5,8 @@ import "./globals.css";
 import QueryProvider from "@/providers/tanstack-query-provider";
 import LayoutWrapper from "@/components/common/layoutWrapper";
 import ReactQueryProvider from "@/providers/tanstack-query-provider";
-// import { CookiesProvider } from "react-cookie";
+import MuiThemeProvider from "@/providers/mui-theme-provider";
 
-
-// const geistSans = Geist({
-//   variable: "--font-geist-sans",
-//   subsets: ["latin"],
-// });
-
-// const geistMono = Geist_Mono({
-//   variable: "--font-geist-mono",
-//   subsets: ["latin"],
-// });
 
 const montserrat = Montserrat({
   variable: "--font-montserrat",
@@ -41,11 +31,13 @@ export default function RootLayout({
         className={`${montserrat.variable} ${montserrat.variable} antialiased`}
       >
         <main style={{ marginLeft: 0 }}>
-          <ReactQueryProvider>
-          <LayoutWrapper>
-          <QueryProvider>{children}</QueryProvider>
-          </LayoutWrapper>
-          </ReactQueryProvider>
+          <MuiThemeProvider>
+            <ReactQueryProvider>
+              <LayoutWrapper>
+                <QueryProvider>{children}</QueryProvider>
+              </LayoutWrapper>
+            </ReactQueryProvider>
+          </MuiThemeProvider>
         </main>
       </body>
     </html>

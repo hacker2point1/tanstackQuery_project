@@ -8,7 +8,7 @@ export function useUserProfile() {
     queryKey: ["user", "profile"],
     queryFn: async () => {
       const res = await getProfile();
-      // expect backend shape { status: true, data: profile }
+      
       return res.data || res;
     },
   });

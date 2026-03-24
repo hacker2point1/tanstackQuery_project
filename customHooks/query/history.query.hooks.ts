@@ -23,7 +23,7 @@ export function useUserHistory(doctorId?: string) {
 						localStorage.setItem("userId", userId);
 					}
 				} catch (e) {
-					// ignore — call history without userId
+					
 				}
 			}
 

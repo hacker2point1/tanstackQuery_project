@@ -14,7 +14,7 @@
   width: 100%;
   max-width: 420px;
   background-color: #ffffff;
-  padding: 32px 28px;   /* 🔥 balanced padding */
+  padding: 32px 28px;  
   border-radius: 16px;
   box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
   text-align: center;
@@ -25,27 +25,27 @@
   font-size: 22px;
   font-weight: 700;
   color: #1f2937;
-  margin-bottom: 8px;  /* tighter */
+  margin-bottom: 8px;  
 }
 
 /* Subtitle */
 .subtitle {
   font-size: 14px;
   color: #6b7280;
-  margin-bottom: 24px;  /* better spacing */
+  margin-bottom: 24px;  
 }
 
 /* OTP Wrapper */
 .otpWrapper {
   display: flex;
-  justify-content: center;  /* 🔥 center properly */
-  gap: 10px;                /* slightly reduced */
-  margin-bottom: 24px;      /* consistent spacing */
+  justify-content: center; 
+  gap: 10px;                
+  margin-bottom: 24px;     
 }
 
 /* OTP Input */
 .otpInput {
-  width: 48px;   /* slightly reduced for better alignment */
+  width: 48px;   
   height: 56px;
   border-radius: 10px;
   border: 1.5px solid #d1d5db;

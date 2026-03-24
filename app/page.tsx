@@ -12,7 +12,7 @@ import FAQSection from "@/components/home/faqSection/faqSection";
 export default function Home() {
   return (
     <>
-    {/* <Banner/> */}
+   
     <HomePage/>
     <AboutUsBanner/>
       <ReviewSection/>

@@ -2,17 +2,23 @@
 "use client";
 
 import { Box, Typography, Button, useTheme } from "@mui/material";
-import { motion } from "framer-motion";
+import StarIcon from '@mui/icons-material/Star';
+import WorkOutlineIcon from '@mui/icons-material/WorkOutline';
+import Link from "next/link";
+import { motion, Variants } from "framer-motion";
 import { useMutation } from "@tanstack/react-query";
-import { useState } from "react";
+import { useState, useMemo } from "react";
+import { useRouter } from "next/navigation";
+import { useDoctorList } from "@/customHooks/query/doctor.query.hooks";
 
-const doctors = [
+// fallback static data when API doesn't return items
+const fallbackDoctors = [
   { id: 1, name: "Dr. John Doe", role: "Cardiologist", img: "/img/doctor1.jpg" },
   { id: 2, name: "Dr. Sarah Smith", role: "Neurologist", img: "/img/doctor2.jpg" },
   { id: 3, name: "Dr. Alex Brown", role: "Orthopedic", img: "/img/doctor3.jpg" },
 ];
 
-const item = {
+const item: Variants = {
   hidden: { opacity: 0, y: 60, scale: 0.96 },
   visible: {
     opacity: 1,
@@ -20,8 +26,8 @@ const item = {
     scale: 1,
     transition: {
       duration: 0.6,
-      ease: [0.22, 1, 0.36, 1],
-    },
+      ease: "easeOut",
+    } as any,
   },
 };
 
@@ -29,21 +35,45 @@ const TeamSection = () => {
   const theme = useTheme();
   const isDark = theme.palette.mode === "dark";
 
-  // ✅ TRACK WHICH BUTTON IS LOADING
-  const [loadingId, setLoadingId] = useState<number | null>(null);
 
-  // ✅ TANSTACK MUTATION
+  const [loadingId, setLoadingId] = useState<number | null>(null);
+  const [clickedId, setClickedId] = useState<number | string | null>(null);
+  const router = useRouter();
+
+  // fetch top 3 experts dynamically
+  const { data: res, isLoading } = useDoctorList({ page: 1, limit: 3 });
+  const doctors = (((res as any)?.data?.doctors) ?? ((res as any)?.doctors) ?? ((res as any)?.data) ?? fallbackDoctors) as any[];
+  const displayDoctors = Array.isArray(doctors) ? doctors.slice(0, 3) : fallbackDoctors;
+
+  const defaultImages = [
+    "/img/doctor1.jpg",
+    "/img/doctor2.jpg",
+    "/img/doctor3.jpg",
+  ];
+
+  // assign an image per displayed doctor (useMemo to keep stable during renders)
+  const assignedImages = useMemo(() => {
+    return displayDoctors.map((doc) => {
+      if (doc?.img) return doc.img;
+      if (doc?.image) return doc.image;
+      // pick a pseudo-random image using doc id when available, else random
+      const seed = doc?.id ?? doc?._id ?? Math.floor(Math.random() * 1000);
+      const idx = Math.abs(String(seed).split("").reduce((acc, ch) => acc + ch.charCodeAt(0), 0)) % defaultImages.length;
+      return defaultImages[idx];
+    });
+  }, [displayDoctors]);
+
+
   const bookingMutation = useMutation({
     mutationFn: async (doctorId: number) => {
       setLoadingId(doctorId);
 
-      // 🔥 replace with your API
       return new Promise((resolve) =>
         setTimeout(() => resolve(true), 1000)
       );
     },
     onSettled: () => {
-      setLoadingId(null); // ✅ reset after success/error
+      setLoadingId(null); //reset succes-error
     },
   });
 
@@ -77,12 +107,24 @@ const TeamSection = () => {
           maxWidth: "1300px",
           mx: "auto",
           display: "flex",
+          flexDirection: "row",
           gap: { xs: 3, md: 4 },
-          flexDirection: { xs: "column", md: "row" },
+          overflowX: { xs: "auto", md: "hidden" },
+          flexWrap: "nowrap",
+          px: { xs: 1, md: 0 },
+          alignItems: "stretch",
+          justifyContent: { xs: 'flex-start', md: 'center' },
         }}
       >
-        {doctors.map((doc) => (
-          <Box key={doc.id} sx={{ flex: 1 }}>
+        {displayDoctors.map((doc, idx) => (
+          <Box
+            key={doc.id ?? doc._id ?? idx}
+            sx={{
+              flex: { xs: '0 0 80%', md: '0 0 calc((100% - 32px) / 3)' },
+              maxWidth: { xs: '80%', md: 'calc((100% - 32px) / 3)' },
+              minWidth: { xs: '260px', md: '0' },
+            }}
+          >
             <motion.div
               variants={item}
               initial="hidden"
@@ -100,30 +142,60 @@ const TeamSection = () => {
                   boxShadow: "0 10px 30px rgba(0,0,0,0.08)",
                 }}
               >
-                {/* IMAGE */}
+                {/* image-place */}
                 <Box
                   sx={{
                     height: 280,
-                    backgroundImage: `url(${doc.img})`,
+                    backgroundImage: `url(${assignedImages[idx]})`,
                     backgroundSize: "cover",
+                    backgroundPosition: 'center',
                   }}
                 />
 
-                {/* CONTENT */}
+                {/* content */}
                 <Box p={3} textAlign="center">
-                  <Typography fontWeight={700} color="#12343b">
-                    {doc.name}
-                  </Typography>
+                  <Box display="flex" alignItems="center" justifyContent="center" gap={1}>
+                    <Typography fontWeight={700} color="#12343b">
+                      {doc.name}
+                    </Typography>
+                    <Box
+                      sx={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 0.5,
+                        background: '#f3f4f6',
+                        px: 1,
+                        borderRadius: '8px',
+                        fontSize: 12,
+                        color: '#374151',
+                      }}
+                    >
+                      <StarIcon sx={{ fontSize: 14, color: '#facc15' }} />
+                      4.8
+                    </Box>
+                  </Box>
 
                   <Typography color="#5f7c80" fontSize={14}>
-                    {doc.role}
+                    {doc?.department?.name || doc?.specialty || doc?.role || ''}
                   </Typography>
 
-                  {/* ✅ FIXED BUTTON */}
+                  <Box mt={1} sx={{ display: 'flex', justifyContent: 'center' }}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.8 }}>
+                      <WorkOutlineIcon sx={{ fontSize: 16, color: '#6b7280' }} />
+                      <Typography fontSize={13} sx={{ color: '#6b7280' }}>
+                        {doc.experience || 10} years
+                      </Typography>
+                    </Box>
+                  </Box>
+
                   <Button
                     fullWidth
-                    onClick={() => bookingMutation.mutate(doc.id)}
-                    disabled={loadingId === doc.id}
+                    onClick={() => {
+                      if (clickedId === (doc.id ?? doc._id)) return;
+                      setClickedId(doc.id ?? doc._id ?? null);
+                      router.push(`/find-doctor?doctorId=${doc.id ?? doc._id ?? ""}`);
+                    }}
+                    disabled={loadingId === doc.id || clickedId === (doc.id ?? doc._id)}
                     sx={{
                       mt: 2.5,
                       borderRadius: "999px",
@@ -133,9 +205,7 @@ const TeamSection = () => {
                       color: "#fff",
                     }}
                   >
-                    {loadingId === doc.id
-                      ? "Booking..."
-                      : "Book Now"}
+                    {clickedId === (doc.id ?? doc._id) ? "Opening..." : loadingId === doc.id ? "Booking..." : "Book Now"}
                   </Button>
                 </Box>
 
@@ -151,6 +221,26 @@ const TeamSection = () => {
           </Box>
         ))}
       </Box>
+
+      <Box textAlign="center" mt={4}>
+        <Button
+          component={Link}
+          href="/find-doctor"
+          variant="contained"
+          disableElevation
+          sx={{
+            px: 4,
+            py: 1.2,
+            borderRadius: "999px",
+            background: "linear-gradient(135deg,#0d6e8a,#12343b)",
+            color: "#fff",
+            textTransform: "none",
+            '&:hover': { background: 'linear-gradient(135deg,#094d63,#0b3746)' },
+          }}
+        >
+          View More
+        </Button>
+      </Box>
     </Box>
   );
 };
@@ -158,189 +248,3 @@ const TeamSection = () => {
 export default TeamSection;
 
 
-
-
-
-//static cards
-// "use client";
-
-// import { Box, Typography, useTheme } from "@mui/material";
-// import { motion } from "framer-motion";
-
-// const doctors = [
-//   { name: "Dr. John Doe", role: "Cardiologist", img: "/img/doctor1.jpg" },
-//   { name: "Dr. Sarah Smith", role: "Neurologist", img: "/img/doctor2.jpg" },
-//   { name: "Dr. Alex Brown", role: "Orthopedic", img: "/img/doctor3.jpg" },
-// ];
-
-// const item = {
-//   hidden: { opacity: 0, y: 60, scale: 0.96 },
-//   visible: {
-//     opacity: 1,
-//     y: 0,
-//     scale: 1,
-//     transition: {
-//       duration: 0.6,
-//       ease: [0.22, 1, 0.36, 1],
-//     },
-//   },
-// };
-
-// const TeamSection = () => {
-//   const theme = useTheme();
-//   const isDark = theme.palette.mode === "dark";
-
-//   return (
-//     <Box
-//       sx={{
-//         width: "100%",
-//         py: { xs: 10, md: 14 },
-//         px: { xs: 2, md: 6 },
-//         position: "relative",
-//         overflow: "hidden",
-//         background: isDark
-//           ? "linear-gradient(180deg, #070F22 0%, #0B1736 100%)"
-//           : "linear-gradient(180deg, #ffffff 0%, #f4f9fc 100%)",
-//       }}
-//     >
-//       {/* Glow Effects */}
-//       <Box
-//         sx={{
-//           position: "absolute",
-//           width: 400,
-//           height: 400,
-//           borderRadius: "50%",
-//           background: "#1878A2",
-//           opacity: 0.12,
-//           filter: "blur(120px)",
-//           top: "-100px",
-//           left: "10%",
-//         }}
-//       />
-//       <Box
-//         sx={{
-//           position: "absolute",
-//           width: 400,
-//           height: 400,
-//           borderRadius: "50%",
-//           background: "#E780A9",
-//           opacity: 0.12,
-//           filter: "blur(120px)",
-//           bottom: "-100px",
-//           right: "10%",
-//         }}
-//       />
-
-//       {/* Heading */}
-//       <Typography
-//         fontSize={{ xs: 28, md: 42 }}
-//         fontWeight={800}
-//         textAlign="center"
-//         mb={8}
-//         sx={{
-//           background: "linear-gradient(90deg,#1878A2,#E780A9)",
-//           WebkitBackgroundClip: "text",
-//           WebkitTextFillColor: "transparent",
-//         }}
-//       >
-//         Our Experts
-//       </Typography>
-
-//       {/* Row Layout */}
-//       <Box
-//         sx={{
-//           maxWidth: "1300px",
-//           mx: "auto",
-//           display: "flex",
-//           gap: { xs: 3, md: 4 },
-//           flexDirection: { xs: "column", md: "row" },
-//         }}
-//       >
-//         {doctors.map((doc, i) => (
-//           <Box key={i} sx={{ flex: 1 }}>
-//             <motion.div
-//               variants={item}
-//               initial="hidden"
-//               whileInView="visible"
-//               viewport={{ once: true }}
-//               whileHover={{ y: -12, scale: 1.03 }}
-//               transition={{
-//                 type: "spring",
-//                 stiffness: 200,
-//                 damping: 15,
-//               }}
-//             >
-//               <Box
-//                 sx={{
-//                   borderRadius: "20px",
-//                   overflow: "hidden",
-//                   backdropFilter: "blur(12px)",
-//                   background: isDark
-//                     ? "rgba(255,255,255,0.05)"
-//                     : "rgba(255,255,255,0.95)",
-//                   border: isDark
-//                     ? "1px solid rgba(255,255,255,0.1)"
-//                     : "1px solid rgba(0,0,0,0.05)",
-//                   boxShadow: isDark
-//                     ? "0 10px 40px rgba(0,0,0,0.4)"
-//                     : "0 10px 30px rgba(0,0,0,0.08)",
-//                 }}
-//               >
-//                 {/* Image */}
-//                 <Box
-//                   sx={{
-//                     height: 280,
-//                     backgroundImage: `url(${doc.img})`,
-//                     backgroundSize: "cover",
-//                     backgroundPosition: "center",
-//                   }}
-//                 />
-
-//                 {/* Content */}
-//                 <Box p={3} textAlign="center">
-//                   {/* ✅ UPDATED NAME COLOR */}
-//                   <Typography
-//                     fontWeight={700}
-//                     fontSize={18}
-//                     sx={{
-//                       color: isDark ? "#ffffff" : "#12343b",
-//                       fontFamily: "var(--font-montserrat), sans-serif",
-//                     }}
-//                   >
-//                     {doc.name}
-//                   </Typography>
-
-//                   {/* ✅ UPDATED ROLE COLOR */}
-//                   <Typography
-//                     sx={{
-//                       fontSize: 14,
-//                       mt: 0.5,
-//                       color: isDark
-//                         ? "rgba(255,255,255,0.7)"
-//                         : "#5f7c80",
-//                       fontFamily: "var(--font-montserrat), sans-serif",
-//                     }}
-//                   >
-//                     {doc.role}
-//                   </Typography>
-//                 </Box>
-
-//                 {/* Gradient Bottom Bar */}
-//                 <Box
-//                   sx={{
-//                     height: "4px",
-//                     width: "100%",
-//                     background:
-//                       "linear-gradient(90deg,#1878A2,#E780A9)",
-//                   }}
-//                 />
-//               </Box>
-//             </motion.div>
-//           </Box>
-//         ))}
-//       </Box>
-//     </Box>
-//   );
-// };
-
-// export default TeamSection;

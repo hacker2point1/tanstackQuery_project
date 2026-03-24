@@ -9,7 +9,7 @@ import {
   Autocomplete,
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
-import { motion } from "framer-motion";
+import { motion, Variants } from "framer-motion";
 import { useState, useEffect } from "react";
 
 // --- TYPEWRITER COMPONENT ---
@@ -63,7 +63,7 @@ const Banner = () => {
   const [search, setSearch] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
 
-  // ✅ SAMPLE OPTIONS (Replace with API later)
+  //  SAMPLE OPTIONS (Replace with API later)
   const options = [
     "Cardiologist",
     "Dermatologist",
@@ -98,7 +98,7 @@ const Banner = () => {
     setSearch(value);
   };
 
-  const boxVariants = {
+  const boxVariants: Variants = {
     hidden: { scale: 0, opacity: 0 },
     visible: (i: number) => ({
       scale: 1,
@@ -108,9 +108,11 @@ const Banner = () => {
         type: "spring",
         stiffness: 260,
         damping: 20,
-      },
+      } as any,
     }),
   };
+
+  const MotionBox = motion(Box);
 
   return (
     <Box
@@ -134,8 +136,7 @@ const Banner = () => {
         justifyContent="center"
       >
         {/* ANIMATED ICON */}
-        <Box
-          component={motion.div}
+        <MotionBox
           initial="hidden"
           animate="visible"
           sx={{
@@ -148,9 +149,8 @@ const Banner = () => {
           }}
         >
           {[1, 2, 3, 4].map((item, i) => (
-            <Box
+            <MotionBox
               key={item}
-              component={motion.div}
               custom={i}
               variants={boxVariants}
               sx={{
@@ -166,11 +166,10 @@ const Banner = () => {
               }}
             />
           ))}
-        </Box>
+        </MotionBox>
 
         {/* TEXT CONTENT */}
-        <Box
-          component={motion.div}
+        <MotionBox
           initial={{ opacity: 0, x: 30 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.8, delay: 0.4 }}
@@ -244,7 +243,7 @@ const Banner = () => {
               />
             )}
           />
-        </Box>
+        </MotionBox>
       </Stack>
     </Box>
   );

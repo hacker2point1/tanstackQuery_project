@@ -44,22 +44,30 @@ const FindDoctorModal: React.FC<Props> = ({ open, onClose }) => {
               if (e.key === "Enter") handleSearch();
             }}
           />
-          <Button variant="contained" onClick={handleSearch} disabled={mutation.isLoading}>
-            {mutation.isLoading ? <CircularProgress size={20} /> : "Search"}
+          <Button
+            variant="contained"
+            onClick={handleSearch}
+            disabled={mutation.status === "pending"}
+          >
+            {mutation.status === "pending" ? (
+              <CircularProgress size={20} />
+            ) : (
+              "Search"
+            )}
           </Button>
         </Box>
 
         {/* Results */}
         <Box>
-          {mutation.isLoading && (
+          {mutation.status === "pending" && (
             <Box sx={{ display: "flex", justifyContent: "center", py: 4 }}>
               <CircularProgress />
             </Box>
           )}
 
-            {mutation.isSuccess && (
+            {mutation.status === "success" && (
               (() => {
-                const raw = mutation.data;
+                const raw = mutation.data as any;
                 const doctors = Array.isArray(raw)
                   ? raw
                   : raw?.doctors || raw?.data?.doctors || raw?.data || [];
@@ -79,7 +87,7 @@ const FindDoctorModal: React.FC<Props> = ({ open, onClose }) => {
               })()
             )}
 
-          {mutation.isError && (
+          {mutation.status === "error" && (
             <Typography color="error">Failed to load doctors</Typography>
           )}
         </Box>

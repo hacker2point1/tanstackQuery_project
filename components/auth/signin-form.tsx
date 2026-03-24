@@ -7,10 +7,15 @@ import {
   Typography,
   Stack,
   Box,
+  Paper,
+  Divider,
+  IconButton,
+  InputAdornment,
 } from "@mui/material";
 import { useForm } from "react-hook-form";
 import ResetPasswordModal from "./resetPassword/resetPassword";
 import { useState } from "react";
+import { Visibility, VisibilityOff } from "@mui/icons-material";
 
 export default function LoginForm({
   onClose,
@@ -23,8 +28,12 @@ export default function LoginForm({
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm();
- const [openReset, setOpenReset] = useState(false);
+  } = useForm<{ email: string; password: string }>();
+
+  const [openReset, setOpenReset] = useState(false);
+
+  // ✅ password toggle state
+  const [showPassword, setShowPassword] = useState(false);
 
   const { mutate, isPending } = useSignInMutation();
 
@@ -34,71 +43,101 @@ export default function LoginForm({
       password: formData.password,
     };
 
-    mutate(Data, {
+    mutate(Data as any, {
       onSuccess: () => {
-        // Close the modal (if provided) without navigating away
         onClose?.();
       },
     });
   };
 
   return (
-    <Stack spacing={2}>
-      <Typography variant="h5" fontWeight={600}>
-        Login
-      </Typography>
-
-      <form onSubmit={handleSubmit(onSubmit)}>
-        <TextField
-          {...register("email", { required: "Email is required" })}
-          label="Email"
-          fullWidth
-          margin="normal"
-          error={!!errors.email}
-          helperText={errors.email?.message as string}
-        />
-
-        <TextField
-          {...register("password", { required: "Password is required" })}
-          label="Password"
-          type="password"
-          fullWidth
-          margin="normal"
-          error={!!errors.password}
-          helperText={errors.password?.message as string}
-        />
-
-        <Button fullWidth size="large" type="submit" sx={{ mt: 2 }}>
-          {isPending ? "Loading..." : "Login"}
-        </Button>
-
-        {/* 🔄 SWITCH */}
-        <Box textAlign="center" mt={2}>
-          <Typography variant="body2">
-            Don’t have an account?{" "}
-            <span
-              onClick={onSwitch}
-              style={{
-                color: "#00A76F",
-                fontWeight: 600,
-                cursor: "pointer",
-              }}
+    <>
+      <Paper
+        elevation={0}
+        sx={{
+          p: 4,
+          borderRadius: "20px",
+          background: "linear-gradient(135deg, #ffffff, #f4f6f8)",
+          minWidth: { xs: "100%", sm: 380 },
+        }}
+      >
+        <Stack spacing={2}>
+          {/* header */}
+          <Box>
+            <Typography
+              variant="h5"
+              fontWeight={700}
+              sx={{ color: "#212B36" }}
             >
-              Sign Up
-            </span>
-          </Typography>
-          <Box
+              Welcome Back
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              Login to continue your journey
+            </Typography>
+          </Box>
+
+          {/* form */}
+          <form onSubmit={handleSubmit(onSubmit)}>
+            <Stack spacing={2}>
+              <TextField
+                {...register("email", { required: "Email is required" })}
+                label="Email"
+                fullWidth
+                size="medium"
+                error={!!errors.email}
+                helperText={errors.email?.message as string}
                 sx={{
-                  display: "flex",
-                  justifyContent: "flex-end",
-                  mt: -1,
+                  "& .MuiOutlinedInput-root": {
+                    borderRadius: "12px",
+                    background: "#fff",
+                  },
                 }}
-              >
+              />
+
+              {/* 🔐 PASSWORD WITH TOGGLE */}
+              <TextField
+                {...register("password", {
+                  required: "Password is required",
+                })}
+                label="Password"
+                type={showPassword ? "text" : "password"}
+                fullWidth
+                size="medium"
+                error={!!errors.password}
+                helperText={errors.password?.message as string}
+                sx={{
+                  "& .MuiOutlinedInput-root": {
+                    borderRadius: "12px",
+                    background: "#fff",
+                  },
+                }}
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <IconButton
+                        onClick={() =>
+                          setShowPassword((prev) => !prev)
+                        }
+                        edge="end"
+                      >
+                        {showPassword ? (
+                          <VisibilityOff />
+                        ) : (
+                          <Visibility />
+                        )}
+                      </IconButton>
+                    </InputAdornment>
+                  ),
+                }}
+              />
+
+              {/* forgot password */}
+              <Box display="flex" justifyContent="flex-end">
                 <Typography
                   fontSize="13px"
                   sx={{
                     cursor: "pointer",
-                    color: "#1976d2",
+                    color: "#00A76F",
                     fontWeight: 600,
                     "&:hover": {
                       textDecoration: "underline",
@@ -109,196 +148,58 @@ export default function LoginForm({
                   Forgot Password?
                 </Typography>
               </Box>
-        </Box>
-      </form>
+
+              {/* login-button */}
+              <Button
+                fullWidth
+                size="large"
+                type="submit"
+                disableElevation
+                sx={{
+                  mt: 1,
+                  height: 45,
+                  borderRadius: "999px",
+                  textTransform: "none",
+                  fontWeight: 600,
+                  background: "linear-gradient(135deg, #212B36, #000000)",
+                  color: "#fff",
+                  "&:hover": {
+                    background: "linear-gradient(135deg, #000000, #212B36)",
+                    transform: "translateY(-1px)",
+                  },
+                }}
+              >
+                {isPending ? "Logging in..." : "Login"}
+              </Button>
+            </Stack>
+          </form>
+
+          <Divider sx={{ my: 1 }} />
+
+          {/* switch */}
+          <Box textAlign="center">
+            <Typography variant="body2">
+              Don’t have an account?{" "}
+              <span
+                onClick={onSwitch}
+                style={{
+                  color: "#00A76F",
+                  fontWeight: 600,
+                  cursor: "pointer",
+                }}
+              >
+                Sign Up
+              </span>
+            </Typography>
+          </Box>
+        </Stack>
+      </Paper>
+
+      {/* reset modal */}
       <ResetPasswordModal
-      open={openReset}
-      handleClose={() => setOpenReset(false)}
-    />
-    </Stack>
-    
+        open={openReset}
+        handleClose={() => setOpenReset(false)}
+      />
+    </>
   );
 }
-
-// "use client";
-
-// import Link from "next/link";
-// import { useSignInMutation } from "@/customHooks/query/auth.query.hooks";
-// import {
-//   Button,
-//   TextField,
-//   Typography,
-//   Stack,
-//   Box,
-// } from "@mui/material";
-// import { useForm } from "react-hook-form";
-
-// export default function LoginForm({ onClose }: { onClose?: () => void }) {
-//   const {
-//     register,
-//     handleSubmit,
-//     formState: { errors },
-//   } = useForm();
-
-//   const { mutate, isPending } = useSignInMutation();
-
-//   const onSubmit = (formData: { email: string; password: string }) => {
-//     const Data = {
-//       email: formData.email,
-//       password: formData.password,
-//     };
-
-//     mutate(Data);
-//   };
-
-//   return (
-//     <Stack spacing={2}>
-//       <Typography variant="h5" fontWeight={600}>
-//         Login
-//       </Typography>
-
-//       <form onSubmit={handleSubmit(onSubmit)}>
-//         <TextField
-//           {...register("email", { required: "Email is required" })}
-//           label="Email"
-//           fullWidth
-//           margin="normal"
-//           error={!!errors.email}
-//           helperText={errors.email?.message as string}
-//         />
-
-//         <TextField
-//           {...register("password", {
-//             required: "Password is required",
-//           })}
-//           label="Password"
-//           type="password"
-//           fullWidth
-//           margin="normal"
-//           error={!!errors.password}
-//           helperText={errors.password?.message as string}
-//         />
-
-//         <Button
-//           variant="contained"
-//           fullWidth
-//           size="large"
-//           type="submit"
-//           sx={{ mt: 2 }}
-//         >
-//           {isPending ? "Loading..." : "Login"}
-//         </Button>
-
-//         {/* 🔥 SIGN UP LINE */}
-//         <Box textAlign="center" mt={2}>
-//           <Typography variant="body2" color="text.secondary">
-//             Don’t have an account?{" "}
-//             <Typography
-//               component={Link}
-//               href="/auth/signUp"
-//               sx={{
-//                 display: "inline",
-//                 fontWeight: 600,
-//                 color: "#00A76F",
-//                 textDecoration: "none",
-//                 cursor: "pointer",
-
-//                 "&:hover": {
-//                   textDecoration: "underline",
-//                 },
-//               }}
-//             >
-//               Sign Up
-//             </Typography>
-//           </Typography>
-//         </Box>
-//       </form>
-//     </Stack>
-//   );
-// }
-
-
-
-
-
-// "use client";
-
-// import { useSignInMutation } from "@/customHooks/query/auth.query.hooks";
-// import {
-//   Button,
-//   Container,
-//   Grid,
-//   Paper,
-//   TextField,
-//   Typography,
-// } from "@mui/material";
-// import { useForm } from "react-hook-form";
-
-// const Login: React.FC = () => {
-//   const {
-//     register,
-//     handleSubmit,
-//     formState: { errors },
-//   } = useForm();
-
-//   const { mutate, isPending } = useSignInMutation();
-
-//   const onSubmit = (formData: { email: string; password: string }) => {
-//     const Data = {
-//       email: formData.email,
-//       password: formData.password,
-//     };
-
-//     mutate(Data);
-//   };
-
-//   return (
-//     <Container>
-//       <Grid container spacing={2}>
-//         <Grid item xs={12} md={6} sx={{ margin: "0 auto" }}>
-//           <Paper elevation={3} sx={{ padding: 2 }}>
-//             <Typography variant="h5" gutterBottom>
-//               Login
-//             </Typography>
-
-//             <form onSubmit={handleSubmit(onSubmit)}>
-//               <TextField
-//                 {...register("email", { required: "Email is required" })}
-//                 label="Email"
-//                 fullWidth
-//                 margin="normal"
-//                 error={!!errors.email}
-//                 helperText={errors.email?.message}
-//               />
-
-//               <TextField
-//                 {...register("password", {
-//                   required: "Password is required",
-//                 })}
-//                 label="Password"
-//                 type="password"
-//                 fullWidth
-//                 margin="normal"
-//                 error={!!errors.password}
-//                 helperText={errors.password?.message}
-//               />
-
-//               <Button
-//                 variant="contained"
-//                 color="primary"
-//                 fullWidth
-//                 size="large"
-//                 type="submit"
-//                 sx={{ marginTop: 2 }}
-//               >
-//                 {isPending ? "Loading..." : "Login"}
-//               </Button>
-//             </form>
-//           </Paper>
-//         </Grid>
-//       </Grid>
-//     </Container>
-//   );
-// };
-
-// export default Login;

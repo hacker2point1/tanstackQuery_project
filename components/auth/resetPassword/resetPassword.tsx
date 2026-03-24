@@ -8,9 +8,10 @@ import {
   Button,
   Box,
   IconButton,
+  Stack,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
-import EmailIcon from "@mui/icons-material/Email";
+import EmailOutlinedIcon from "@mui/icons-material/EmailOutlined";
 
 import { useForm } from "react-hook-form";
 import { useResetLinkMutation } from "@/customHooks/query/auth.query.hooks";
@@ -21,7 +22,12 @@ interface Props {
 }
 
 const ResetPasswordModal: React.FC<Props> = ({ open, handleClose }) => {
-  const { register, handleSubmit } = useForm();
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm();
+
   const { mutate, isPending } = useResetLinkMutation();
 
   const onSubmit = (data: any) => {
@@ -43,26 +49,25 @@ const ResetPasswordModal: React.FC<Props> = ({ open, handleClose }) => {
       fullWidth
       BackdropProps={{
         sx: {
-          background: "rgba(10, 20, 40, 0.6)",
-          backdropFilter: "blur(14px)",
+          background: "rgba(0,0,0,0.5)",
+          backdropFilter: "blur(10px)",
         },
       }}
       PaperProps={{
         sx: {
           borderRadius: "20px",
           overflow: "hidden",
+          background: "linear-gradient(135deg, #ffffff, #f4f6f8)",
         },
       }}
     >
       <DialogContent sx={{ p: 0 }}>
-        
-        {/* HEADER */}
+        {/* header */}
         <Box
           sx={{
-            background: "linear-gradient(135deg, #1976d2, #42a5f5)",
-            color: "#fff",
-            textAlign: "center",
+            px: 3,
             py: 3,
+            borderBottom: "1px solid #eee",
             position: "relative",
           }}
         >
@@ -72,61 +77,53 @@ const ResetPasswordModal: React.FC<Props> = ({ open, handleClose }) => {
               position: "absolute",
               right: 10,
               top: 10,
-              color: "#fff",
+              color: "#212B36",
             }}
           >
             <CloseIcon />
           </IconButton>
 
-          <Box
-            sx={{
-              width: 50,
-              height: 50,
-              mx: "auto",
-              borderRadius: "12px",
-              background: "rgba(255,255,255,0.2)",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              mb: 1,
-            }}
-          >
-            <EmailIcon />
-          </Box>
+          <Stack direction="row" spacing={2} alignItems="center">
+            <Box
+              sx={{
+                width: 45,
+                height: 45,
+                borderRadius: "12px",
+                background: "#E8F5E9",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <EmailOutlinedIcon sx={{ color: "#00A76F" }} />
+            </Box>
 
-          <Typography fontSize="20px" fontWeight={600}>
-            Reset Password
-          </Typography>
-
-          <Typography fontSize="13px" sx={{ opacity: 0.9 }}>
-            Enter your email to receive reset link
-          </Typography>
+            <Box>
+              <Typography fontSize="18px" fontWeight={700}>
+                Reset Password
+              </Typography>
+              <Typography fontSize="13px" color="text.secondary">
+                Enter your email to receive reset link
+              </Typography>
+            </Box>
+          </Stack>
         </Box>
 
-        {/* BODY */}
+        {/* body */}
         <Box sx={{ px: 3, py: 3 }}>
           <form onSubmit={handleSubmit(onSubmit)}>
-            
             <TextField
-              {...register("email")}
+              {...register("email", { required: "Email is required" })}
               placeholder="Enter your email"
               fullWidth
-              variant="outlined"
-              size="small"
+              size="medium"
+              error={!!errors.email}
+              helperText={errors.email?.message as string}
               sx={{
                 mb: 3,
                 "& .MuiOutlinedInput-root": {
-                  borderRadius: "10px",
-                  backgroundColor: "#fff",
-                },
-                "& .MuiOutlinedInput-notchedOutline": {
-                  border: "2px solid #cbd5e1",
-                },
-                "&:hover .MuiOutlinedInput-notchedOutline": {
-                  border: "2px solid #1976d2",
-                },
-                "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-                  border: "2px solid #1976d2",
+                  borderRadius: "12px",
+                  background: "#fff",
                 },
               }}
             />
@@ -135,13 +132,18 @@ const ResetPasswordModal: React.FC<Props> = ({ open, handleClose }) => {
               type="submit"
               fullWidth
               disabled={isPending}
+              disableElevation
               sx={{
                 height: 45,
-                borderRadius: "10px",
+                borderRadius: "999px",
                 textTransform: "none",
                 fontWeight: 600,
-                background: "linear-gradient(90deg, #1976d2, #42a5f5)",
-                boxShadow: "0 6px 20px rgba(25,118,210,0.4)",
+                background: "linear-gradient(135deg, #212B36, #000000)",
+                color: "#fff",
+                "&:hover": {
+                  background: "linear-gradient(135deg, #000000, #212B36)",
+                  transform: "translateY(-1px)",
+                },
               }}
             >
               {isPending ? "Sending..." : "Send Reset Link"}

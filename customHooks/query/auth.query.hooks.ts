@@ -13,27 +13,29 @@ import { ResetPasswordFunction } from "@/api/functions/resetPassword.api";
 
 //custom quary
 // signUp
-export const useSignUpMutation = () => {
-  // const cookies = new Cookies()
+export const useSignUpMutation = (opts?: { redirectToOtp?: boolean }) => {
+  const redirectToOtp = opts?.redirectToOtp ?? true;
   const { queryClient } = useGlobalHooks();
-  const router = useRouter()
+  const router = useRouter();
 
   return useMutation({
     mutationFn: RegistrationFunction,
     onSuccess: (response) => {
       console.log(response);
-      const {status, message, data } = response || {};
+      const { status, message, data } = response || {};
       const userId = data?.id;
       const email = data?.email;
-     console.log(response)
-      
+      console.log(response);
+
       if (status === true) {
-        localStorage.setItem("userId", userId);
-        localStorage.setItem("email", email);
-        // console.log(userId,"userid")
-        // console.log(email,"email")
+        if (typeof window !== "undefined") {
+          if (userId) localStorage.setItem("userId", userId);
+          if (email) localStorage.setItem("email", email);
+        }
         toast.success(message);
-        router.push("/auth/otp")
+        if (redirectToOtp) {
+          router.push("/auth/otp");
+        }
       } else {
         toast.error(message);
       }
@@ -90,7 +92,9 @@ export const useSignInMutation = (options?: {
     mutationFn: LoginFunction,
     onSuccess: (response) => {
       console.log(response);
-      const { token, status, message } = response || {};
+      const token = (response as any)?.token;
+      const status = (response as any)?.status;
+      const message = (response as any)?.message;
 
       if (status === true) {
         cookies.set("token", token, {

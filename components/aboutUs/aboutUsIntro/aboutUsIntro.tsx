@@ -1,8 +1,16 @@
 "use client";
 
-import { fadeUp } from "@/components/animations/fadeUpAnimation/fadeUp";
 import { Box, Typography, Stack, useTheme, Container } from "@mui/material";
-import { motion } from "framer-motion";
+import { motion, Variants } from "framer-motion";
+
+const fadeUp: Variants = {
+  hidden: { opacity: 0, y: 40 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.6, ease: "easeOut" },
+  },
+};
 
 const AboutIntro = () => {
   const theme = useTheme();
@@ -21,13 +29,13 @@ const AboutIntro = () => {
         position: "relative",
         overflow: "hidden",
 
-        // 🌈 Theme Gradient Background
+        
         background: isDark
           ? "linear-gradient(180deg, #0B1736 0%, #070F22 100%)"
           : "linear-gradient(180deg, #ffffff 0%, #f4f9fc 100%)",
       }}
     >
-      {/* 🔥 Blue Glow */}
+     
       <Box
         sx={{
           position: "absolute",
@@ -68,7 +76,7 @@ const AboutIntro = () => {
         >
           <Stack spacing={4} alignItems="center">
 
-            {/* 🌟 Heading with Brand Gradient */}
+           
             <Typography
               fontSize={{ xs: 30, md: 48 }}
               fontWeight={800}
@@ -82,7 +90,7 @@ const AboutIntro = () => {
               Who We Are
             </Typography>
 
-            {/* 📄 Description */}
+            {/* description */}
             <Typography
               fontSize={{ xs: 15, md: 18 }}
               lineHeight={1.8}
