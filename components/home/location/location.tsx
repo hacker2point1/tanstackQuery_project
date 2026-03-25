@@ -3,8 +3,12 @@
 import { Box, Typography, Stack, Button } from "@mui/material";
 import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 import ArrowOutwardIcon from "@mui/icons-material/ArrowOutward";
+import { useState } from "react";
+import LocationModal from "@/components/modals/locationModal/locationModal";
 
 const LocationSection = () => {
+  const [openLocationModal, setOpenLocationModal] = useState(false);
+
   return (
     <Box
       sx={{
@@ -14,7 +18,7 @@ const LocationSection = () => {
         overflow: "hidden",
       }}
     >
-      {/* GOOGLE MAP BACKGROUND */}
+      {/* google map */}
       <Box
         sx={{
           position: "absolute",
@@ -98,6 +102,7 @@ const LocationSection = () => {
 
             <Button
               endIcon={<ArrowOutwardIcon />}
+              onClick={() => setOpenLocationModal(true)}
               sx={{
                 color: "#fff",
                 textTransform: "none",
@@ -110,6 +115,11 @@ const LocationSection = () => {
           </Stack>
         </Box>
       </Box>
+
+      <LocationModal
+        open={openLocationModal}
+        onClose={() => setOpenLocationModal(false)}
+      />
     </Box>
   );
 };

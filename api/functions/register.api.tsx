@@ -1,6 +1,3 @@
-
-
-
 import { MutationFunction } from "@tanstack/react-query";
 
 import { endpoints } from "../endpoints/endpoints";
@@ -16,5 +13,5 @@ export const RegistrationFunction: MutationFunction<
     payload
   );
 
-  return res.data; 
+  return res.data;
 };

@@ -1,6 +1,5 @@
 
 import { MutationFunction } from "@tanstack/react-query";
-// import axiosInstance from "../axios/axios";
 import { endpoints } from "../endpoints/endpoints";
 import { AxiosInstance } from "../axios/axios";
 

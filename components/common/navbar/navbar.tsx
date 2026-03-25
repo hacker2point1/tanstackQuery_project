@@ -163,9 +163,9 @@ export default function Navbar() {
 
           {/* right-section */}
           <Stack direction="row" spacing={1} alignItems="center">
-            <IconButton onClick={() => setOpenSearch(true)}>
+            {/* <IconButton onClick={() => setOpenSearch(true)}>
               <SearchIcon />
-            </IconButton>
+            </IconButton> */}
 
             <IconButton color="black" onClick={() => setOpenLocation(true)}>
               <LocationOnIcon />

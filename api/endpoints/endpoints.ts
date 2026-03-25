@@ -1,27 +1,27 @@
-export const endpoints ={
-    auth:{
-        signUp:"/auth/register",
-        otp:"/auth/verify_otp",
-        signIn:"/auth/login",
-        logout:"/user/logout",
-        profile:"/user/profile",
-        history:"/user/history",
-        resetLink:"/auth/resetlink",
-        resetPassword:"/reset-password",
-        mapLocation:"/diagnostic/nearby"
+export const endpoints = {
+    auth: {
+        signUp: "/auth/register",
+        otp: "/auth/verify_otp",
+        signIn: "/auth/login",
+        logout: "/user/logout",
+        profile: "/user/profile",
+        history: "/user/history",
+        resetLink: "/auth/resetlink",
+        resetPassword: "/reset-password",
+        mapLocation: "/diagnostic/nearby"
     },
-    doctor:{
-        list:"/user/doctor/list",
-        appoinment:"/doctor/appointment",
-           slots: "/user/slot/list", 
-           
+    doctor: {
+        list: "/user/doctor/list",
+        appoinment: "/doctor/appointment",
+        slots: "/user/slot/list",
+
     },
-    
-    
+
+
 }
 
 
-export const collectionOfEndpoints:string[]=[
+export const collectionOfEndpoints: string[] = [
     endpoints.auth.signUp,
     endpoints.auth.otp,
     endpoints.auth.signIn,
@@ -35,7 +35,7 @@ export const collectionOfEndpoints:string[]=[
     //doctor
     endpoints.doctor.list,
     endpoints.doctor.appoinment,
-        endpoints.doctor.slots,
-    
+    endpoints.doctor.slots,
+
 ]
 

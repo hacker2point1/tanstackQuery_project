@@ -1,5 +1,4 @@
 import { AxiosInstance } from "../axios/axios";
-// import { Center } from "@/types/map.types";
 import { endpoints } from "../endpoints/endpoints";
 
 interface Center {
@@ -17,7 +16,7 @@ interface Center {
 export const fetchCenters = async (
   lat: number,
   lng: number,
-  distance: number = 5000
+  distance: number
 ): Promise<Center[]> => {
   try {
     const res = await AxiosInstance.get(endpoints.auth.mapLocation, {

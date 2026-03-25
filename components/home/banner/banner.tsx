@@ -4,13 +4,17 @@ import {
   Box,
   Typography,
   Stack,
-  TextField,
-  InputAdornment,
-  Autocomplete,
 } from "@mui/material";
-import SearchIcon from "@mui/icons-material/Search";
 import { motion, Variants } from "framer-motion";
 import { useState, useEffect } from "react";
+import { BannerSearch } from "./banner-search";
+
+interface DoctorOption {
+  _id: string;
+  name: string;
+  department?: any;
+  label: string;
+}
 
 // --- TYPEWRITER COMPONENT ---
 const TypewriterText = ({ words }: { words: string[] }) => {
@@ -59,44 +63,6 @@ const TypewriterText = ({ words }: { words: string[] }) => {
 // --- MAIN BANNER COMPONENT ---
 const Banner = () => {
   const words = ["care", "healing", "wellness", "comfort", "trust", "hospitality"];
-
-  const [search, setSearch] = useState("");
-  const [debouncedSearch, setDebouncedSearch] = useState("");
-
-  //  SAMPLE OPTIONS (Replace with API later)
-  const options = [
-    "Cardiologist",
-    "Dermatologist",
-    "Neurologist",
-    "Orthopedic",
-    "Pediatrician",
-    "Radiology",
-    "ENT Specialist",
-    "General Medicine",
-  ];
-
-  // debounce controller
-  useEffect(() => {
-    const handler = setTimeout(() => {
-      setDebouncedSearch(search);
-    }, 500); 
-
-    return () => clearTimeout(handler);
-  }, [search]);
-
-  // 👉 API CALL TRIGGER (debounced)
-  useEffect(() => {
-    if (debouncedSearch) {
-      console.log("Searching:", debouncedSearch);
-
-      // 👉 Call API here
-      // dispatch(searchDoctors(debouncedSearch))
-    }
-  }, [debouncedSearch]);
-
-  const handleSearch = (value: string) => {
-    setSearch(value);
-  };
 
   const boxVariants: Variants = {
     hidden: { scale: 0, opacity: 0 },
@@ -177,9 +143,8 @@ const Banner = () => {
         >
           <Typography
             variant="h1"
-            
             sx={{
-            fontFamily:"var(--font-montserrat), sans-serif",
+              fontFamily: "var(--font-montserrat), sans-serif",
               fontWeight: 600,
               color: "#12343b",
               lineHeight: 1.1,
@@ -194,7 +159,7 @@ const Banner = () => {
 
           <Typography
             sx={{
-                fontFamily:"var(--font-montserrat), sans-serif",
+              fontFamily: "var(--font-montserrat), sans-serif",
               mt: 3,
               color: "#2f4f4f",
               fontSize: { xs: "18px", md: "22px" },
@@ -210,39 +175,10 @@ const Banner = () => {
             accredited hospital in the heart of INDIA.
           </Typography>
 
-          {/* 🔍 AUTOCOMPLETE SEARCH */}
-          <Autocomplete
-            freeSolo
-            options={options}
-            inputValue={search}
-            onInputChange={(event, newValue) => handleSearch(newValue)}
-            sx={{
-              mt: 4,
-              maxWidth: "500px",
-              backgroundColor: "#fff",
-              borderRadius: "50px",
-            }}
-            renderInput={(params) => (
-              <TextField
-                {...params}
-                placeholder="Search doctors, departments..."
-                sx={{
-                  "& .MuiOutlinedInput-root": {
-                    borderRadius: "50px",
-                    paddingRight: "10px",
-                  },
-                }}
-                InputProps={{
-                  ...params.InputProps,
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      <SearchIcon sx={{ color: "#d87aa0" }} />
-                    </InputAdornment>
-                  ),
-                }}
-              />
-            )}
-          />
+          {/* 🔍 SEARCH COMPONENT */}
+          <Box sx={{ mt: 4 }}>
+            <BannerSearch />
+          </Box>
         </MotionBox>
       </Stack>
     </Box>
