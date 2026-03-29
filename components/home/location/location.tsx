@@ -35,7 +35,7 @@ const LocationSection = () => {
         />
       </Box>
 
-     
+
       <Box
         sx={{
           position: "absolute",
@@ -63,8 +63,8 @@ const LocationSection = () => {
               fontWeight: 700,
               fontSize: { xs: "32px", md: "48px" },
               mb: 2,
-              fontFamily:"var(--font-montserrat), sans-serif",
-              
+              fontFamily: "var(--font-montserrat), sans-serif",
+
             }}
           >
             Discover Our Location
@@ -76,16 +76,20 @@ const LocationSection = () => {
               fontSize: { xs: "16px", md: "18px" },
               lineHeight: 1.6,
               mb: 4,
-              fontFamily:"var(--font-montserrat), sans-serif",
+              fontFamily: "var(--font-montserrat), sans-serif",
             }}
           >
             Visit us at NRS Medical College and Hospital, located in the heart
             of Kolkata, providing accessible and trusted healthcare services.
           </Typography>
 
-     
+
           <Stack direction="row" spacing={3} alignItems="center">
             <Button
+              component="a"
+              href="https://youtu.be/RDOxiazPpMo"
+              target="_blank"
+              rel="noopener noreferrer"
               startIcon={<PlayArrowIcon />}
               sx={{
                 color: "#fff",
@@ -94,7 +98,7 @@ const LocationSection = () => {
                 px: 3,
                 py: 1,
                 textTransform: "none",
-                fontFamily:"var(--font-montserrat), sans-serif",
+                fontFamily: "var(--font-montserrat), sans-serif",
               }}
             >
               Watch Video
@@ -107,7 +111,7 @@ const LocationSection = () => {
                 color: "#fff",
                 textTransform: "none",
                 fontWeight: 500,
-                fontFamily:"var(--font-montserrat), sans-serif",
+                fontFamily: "var(--font-montserrat), sans-serif",
               }}
             >
               Discover More

@@ -33,16 +33,17 @@ const useUserStore = create<UserState>((set) => ({
       
     }
 
+    //when we logout this function will remove the access token and the refresh token from the cookies and also remove the userId and email from localStorage and then set the token in the zustand store to null.
     
     try {
       cookie.remove("token", { path: "/" });
-    } catch (e) {
-      
+    } catch (error) {
+      console.log(error,"error")
     }
     try {
       cookie.remove("refreshToken", { path: "/" });
-    } catch (e) {
-      
+    } catch (error) {
+      console.log(error,"error")
     }
 
    
@@ -51,16 +52,16 @@ const useUserStore = create<UserState>((set) => ({
         localStorage.removeItem("userId");
         localStorage.removeItem("email");
       }
-    } catch (e) {
-      
+    } catch (error) {
+      console.log(error,"error")
     }
 
     
     set({ token: null });
     try {
       toast.success("Logged out successfully");
-    } catch (e) {
-      
+    } catch (error) {
+      console.log(error, "error")
     }
   },
 

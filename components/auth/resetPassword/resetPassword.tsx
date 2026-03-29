@@ -140,6 +140,13 @@ const ResetPasswordModal: React.FC<Props> = ({ open, handleClose }) => {
                 fontWeight: 600,
                 background: "linear-gradient(135deg, #212B36, #000000)",
                 color: "#fff",
+
+                //keep the disabled white text
+                "&.Mui-disabled": {
+                  color: "#fff",
+                  opacity: 0.8,
+                },
+
                 "&:hover": {
                   background: "linear-gradient(135deg, #000000, #212B36)",
                   transform: "translateY(-1px)",
@@ -156,3 +163,12 @@ const ResetPasswordModal: React.FC<Props> = ({ open, handleClose }) => {
 };
 
 export default ResetPasswordModal;
+
+//if i want the circular loader use this code
+// import CircularProgress from "@mui/material/CircularProgress";
+
+// {isPending ? (
+//   <CircularProgress size={20} sx={{ color: "#fff" }} />
+// ) : (
+//   "Send Reset Link"
+// )}

@@ -6,10 +6,10 @@ import StarIcon from '@mui/icons-material/Star';
 import WorkOutlineIcon from '@mui/icons-material/WorkOutline';
 import Link from "next/link";
 import { motion, Variants } from "framer-motion";
-import { useMutation } from "@tanstack/react-query";
 import { useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { useDoctorList } from "@/customHooks/query/doctor.query.hooks";
+import AppointmentModal from "@/components/modals/appointmentModal/appointmentModal";
 
 // fallback static data when API doesn't return items
 const fallbackDoctors = [
@@ -35,10 +35,9 @@ const TeamSection = () => {
   const theme = useTheme();
   const isDark = theme.palette.mode === "dark";
 
-
-  const [loadingId, setLoadingId] = useState<number | null>(null);
-  const [clickedId, setClickedId] = useState<number | string | null>(null);
   const router = useRouter();
+  const [modalOpen, setModalOpen] = useState(false);
+  const [selectedDoctor, setSelectedDoctor] = useState<any>(null);
 
   // fetch top 3 experts dynamically
   const { data: res, isLoading } = useDoctorList({ page: 1, limit: 3 });
@@ -51,31 +50,15 @@ const TeamSection = () => {
     "/img/doctor3.jpg",
   ];
 
-  // assign an image per displayed doctor (useMemo to keep stable during renders)
+  // assign an image per displayed doctor (cycle through defaults to avoid consecutive duplicates)
   const assignedImages = useMemo(() => {
-    return displayDoctors.map((doc) => {
+    return displayDoctors.map((doc, index) => {
       if (doc?.img) return doc.img;
       if (doc?.image) return doc.image;
-      // pick a pseudo-random image using doc id when available, else random
-      const seed = doc?.id ?? doc?._id ?? Math.floor(Math.random() * 1000);
-      const idx = Math.abs(String(seed).split("").reduce((acc, ch) => acc + ch.charCodeAt(0), 0)) % defaultImages.length;
-      return defaultImages[idx];
+      // cycle through default images to ensure no consecutive duplicates
+      return defaultImages[index % defaultImages.length];
     });
   }, [displayDoctors]);
-
-
-  const bookingMutation = useMutation({
-    mutationFn: async (doctorId: number) => {
-      setLoadingId(doctorId);
-
-      return new Promise((resolve) =>
-        setTimeout(() => resolve(true), 1000)
-      );
-    },
-    onSettled: () => {
-      setLoadingId(null); //reset succes-error
-    },
-  });
 
   return (
     <Box
@@ -191,11 +174,9 @@ const TeamSection = () => {
                   <Button
                     fullWidth
                     onClick={() => {
-                      if (clickedId === (doc.id ?? doc._id)) return;
-                      setClickedId(doc.id ?? doc._id ?? null);
-                      router.push(`/find-doctor?doctorId=${doc.id ?? doc._id ?? ""}`);
+                      setSelectedDoctor(doc);
+                      setModalOpen(true);
                     }}
-                    disabled={loadingId === doc.id || clickedId === (doc.id ?? doc._id)}
                     sx={{
                       mt: 2.5,
                       borderRadius: "999px",
@@ -205,7 +186,7 @@ const TeamSection = () => {
                       color: "#fff",
                     }}
                   >
-                    {clickedId === (doc.id ?? doc._id) ? "Opening..." : loadingId === doc.id ? "Booking..." : "Book Now"}
+                    Book Now
                   </Button>
                 </Box>
 
@@ -241,6 +222,19 @@ const TeamSection = () => {
           View More
         </Button>
       </Box>
+
+      <AppointmentModal
+        open={modalOpen}
+        onClose={() => setModalOpen(false)}
+        doctorId={selectedDoctor?.id ?? selectedDoctor?._id}
+        doctor={selectedDoctor}
+        onSubmit={async (payload) => {
+          // Handle booking submission
+          console.log("Booking appointment:", payload, "for doctor:", selectedDoctor);
+          // You can integrate with your booking API here
+          setModalOpen(false);
+        }}
+      />
     </Box>
   );
 };

@@ -12,7 +12,7 @@ import {
   InputAdornment,
 } from "@mui/material";
 import { useForm } from "react-hook-form";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 
 import { toast } from "sonner";
@@ -34,6 +34,10 @@ const ResetPasswordPage = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
+  //countdown states
+  const [isSuccess, setIsSuccess] = useState(false);
+  const [countdown, setCountdown] = useState(3);
+
   const passwordValue = watch("password");
 
   const onSubmit = (data: any) => {
@@ -51,11 +55,27 @@ const ResetPasswordPage = () => {
       },
       {
         onSuccess: () => {
-          router.push("/");
+          toast.success("Password reset successful 🎉");
+          setIsSuccess(true);
         },
       }
     );
   };
+//countdown use effect
+  useEffect(() => {
+    if (!isSuccess) return;
+
+    if (countdown === 0) {
+      router.push("/"); // change route if needed
+      return;
+    }
+
+    const timer = setTimeout(() => {
+      setCountdown((prev) => prev - 1);
+    }, 1000);
+
+    return () => clearTimeout(timer);
+  }, [isSuccess, countdown, router]);
 
   return (
     <Box
@@ -79,23 +99,19 @@ const ResetPasswordPage = () => {
         }}
       >
         <Stack spacing={2}>
-          
+          {/* logo */}
           <Box sx={{ display: "flex", justifyContent: "center", mb: 1 }}>
             <Box
               component="img"
               src="/img/logo3.png"
               alt="Logo"
-              sx={{ height: 64, objectFit: "contain" }}
+              sx={{ height: 64 }}
             />
           </Box>
 
           {/* header */}
           <Box>
-            <Typography
-              variant="h5"
-              fontWeight={700}
-              sx={{ color: "#212B36" }}
-            >
+            <Typography variant="h5" fontWeight={700}>
               Reset Password
             </Typography>
 
@@ -104,108 +120,117 @@ const ResetPasswordPage = () => {
             </Typography>
           </Box>
 
-          {/* form */}
-          <form onSubmit={handleSubmit(onSubmit)}>
-            <Stack spacing={2}>
-              {/* password */}
-              <TextField
-                {...register("password", {
-                  required: "Password is required",
-                })}
-                label="New Password"
-                type={showPassword ? "text" : "password"}
-                fullWidth
-                error={!!errors.password}
-                helperText={errors.password?.message as string}
-                sx={{
-                  "& .MuiOutlinedInput-root": {
-                    borderRadius: "12px",
-                    background: "#fff",
-                  },
-                }}
-                InputProps={{
-                  endAdornment: (
-                    <InputAdornment position="end">
-                      <IconButton
-                        onClick={() =>
-                          setShowPassword((prev) => !prev)
-                        }
-                      >
-                        {showPassword ? (
-                          <VisibilityOff />
-                        ) : (
-                          <Visibility />
-                        )}
-                      </IconButton>
-                    </InputAdornment>
-                  ),
-                }}
-              />
+          {/* success state */}
+          {isSuccess ? (
+            <Box textAlign="center" py={3}>
+              <Typography fontWeight={600} mb={1}>
+                ✅ Password updated successfully
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                Redirecting in {countdown}s...
+              </Typography>
+            </Box>
+          ) : (
+            <form onSubmit={handleSubmit(onSubmit)}>
+              <Stack spacing={2}>
+                {/* password */}
+                <TextField
+                  {...register("password", {
+                    required: "Password is required",
+                  })}
+                  label="New Password"
+                  type={showPassword ? "text" : "password"}
+                  fullWidth
+                  error={!!errors.password}
+                  helperText={errors.password?.message as string}
+                  sx={{
+                    "& .MuiOutlinedInput-root": {
+                      borderRadius: "12px",
+                      background: "#fff",
+                    },
+                  }}
+                  InputProps={{
+                    endAdornment: (
+                      <InputAdornment position="end">
+                        <IconButton
+                          onClick={() =>
+                            setShowPassword((prev) => !prev)
+                          }
+                        >
+                          {showPassword ? (
+                            <VisibilityOff />
+                          ) : (
+                            <Visibility />
+                          )}
+                        </IconButton>
+                      </InputAdornment>
+                    ),
+                  }}
+                />
 
-              {/* confirm-password */}
-              <TextField
-                {...register("confirmPassword", {
-                  required: "Confirm Password is required",
-                  validate: (value) =>
-                    value === passwordValue ||
-                    "Passwords do not match",
-                })}
-                label="Confirm Password"
-                type={showConfirmPassword ? "text" : "password"}
-                fullWidth
-                error={!!errors.confirmPassword}
-                helperText={errors.confirmPassword?.message as string}
-                sx={{
-                  "& .MuiOutlinedInput-root": {
-                    borderRadius: "12px",
-                    background: "#fff",
-                  },
-                }}
-                InputProps={{
-                  endAdornment: (
-                    <InputAdornment position="end">
-                      <IconButton
-                        onClick={() =>
-                          setShowConfirmPassword((prev) => !prev)
-                        }
-                      >
-                        {showConfirmPassword ? (
-                          <VisibilityOff />
-                        ) : (
-                          <Visibility />
-                        )}
-                      </IconButton>
-                    </InputAdornment>
-                  ),
-                }}
-              />
+                {/* confirm password */}
+                <TextField
+                  {...register("confirmPassword", {
+                    required: "Confirm Password is required",
+                    validate: (value) =>
+                      value === passwordValue ||
+                      "Passwords do not match",
+                  })}
+                  label="Confirm Password"
+                  type={showConfirmPassword ? "text" : "password"}
+                  fullWidth
+                  error={!!errors.confirmPassword}
+                  helperText={errors.confirmPassword?.message as string}
+                  sx={{
+                    "& .MuiOutlinedInput-root": {
+                      borderRadius: "12px",
+                      background: "#fff",
+                    },
+                  }}
+                  InputProps={{
+                    endAdornment: (
+                      <InputAdornment position="end">
+                        <IconButton
+                          onClick={() =>
+                            setShowConfirmPassword((prev) => !prev)
+                          }
+                        >
+                          {showConfirmPassword ? (
+                            <VisibilityOff />
+                          ) : (
+                            <Visibility />
+                          )}
+                        </IconButton>
+                      </InputAdornment>
+                    ),
+                  }}
+                />
 
-              {/* button */}
-              <Button
-                type="submit"
-                fullWidth
-                disabled={isPending}
-                disableElevation
-                sx={{
-                  mt: 1,
-                  height: 48,
-                  borderRadius: "999px",
-                  textTransform: "none",
-                  fontWeight: 600,
-                  background:
-                    "linear-gradient(135deg, #212B36, #000000)",
-                  color: "#fff",
-                  "&:hover": {
+                {/* button */}
+                <Button
+                  type="submit"
+                  fullWidth
+                  disabled={isPending}
+                  sx={{
+                    height: 48,
+                    borderRadius: "999px",
+                    textTransform: "none",
+                    fontWeight: 600,
                     background:
-                      "linear-gradient(135deg, #000000, #212B36)",
-                    transform: "translateY(-1px)",
-                  },
-                }}
-              >
-                {isPending ? "Resetting..." : "Reset Password"}
-              </Button>
-            </Stack>
-          </form>
+                      "linear-gradient(135deg, #212B36, #000000)",
+                    color: "#fff",
+
+                    "&.Mui-disabled": {
+                      color: "#fff",
+                      opacity: 0.8,
+                    },
+                  }}
+                >
+                  {isPending ? "Resetting..." : "Reset Password"}
+                </Button>
+              </Stack>
+            </form>
+          )}
         </Stack>
       </Paper>
     </Box>
@@ -213,3 +238,4 @@ const ResetPasswordPage = () => {
 };
 
 export default ResetPasswordPage;
+

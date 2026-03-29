@@ -22,6 +22,7 @@ export default function AppointmentModal({
   defaultTime = "",
   doctorId,
   doctor,
+  cardImage,
 }: {
   open: boolean;
   onClose: () => void;
@@ -31,11 +32,15 @@ export default function AppointmentModal({
   defaultTime?: string;
   doctorId?: string | null;
   doctor?: any | null;
+  cardImage?: string;
 }) {
   const [date, setDate] = useState<string>(defaultDate || "");
   const [time, setTime] = useState<string>(defaultTime || "");
   const [name, setName] = useState<string>(defaultName);
   const [submitting, setSubmitting] = useState(false);
+
+  // Use the same image as shown on the card
+  const modalImage = cardImage || doctor?.image || doctor?.img || "/img/doctor1.jpg";
 
   React.useEffect(() => {
     if (open) {
@@ -95,7 +100,7 @@ export default function AppointmentModal({
                   }}
                 >
                   <img
-                    src={doctor.image || "/img/doctor1.jpg"}
+                    src={modalImage}
                     alt={doctor.name}
                     style={{
                       width: "100%",
@@ -122,7 +127,7 @@ export default function AppointmentModal({
 
             <Box
               component="img"
-              src="/img/doctor1.jpg"
+              src={modalImage}
               alt="Doctor"
               sx={{
                 width: "100%",
@@ -134,17 +139,17 @@ export default function AppointmentModal({
             />
 
             <Typography fontSize={22} fontWeight={700}>
-              Dr. Sarah Johnson
+              {doctor?.name || "Dr. Sarah Johnson"}
             </Typography>
 
             <Typography color="#666" mb={2}>
-              Cardiologist
+              {doctor?.department?.name || doctor?.specialty || doctor?.role || "Cardiologist"}
             </Typography>
 
             <Stack spacing={1.5} color="#555">
-              <Typography>🗓 15 years of experience</Typography>
-              <Typography>🎓 MD from Harvard Medical School</Typography>
-              <Typography>📍 New York Medical Center</Typography>
+              <Typography>🗓 {doctor?.experience || 15} years of experience</Typography>
+              <Typography>🎓 {doctor?.qualification || "MD from Harvard Medical School"}</Typography>
+              <Typography>📍 {doctor?.location || "New York Medical Center"}</Typography>
             </Stack>
 
             <Divider sx={{ my: 3 }} />
@@ -154,8 +159,7 @@ export default function AppointmentModal({
             </Typography>
 
             <Typography color="#666">
-              Specialized in preventive cardiology and heart disease management
-              with over 15 years of experience.
+              {doctor?.about || "Specialized in preventive cardiology and heart disease management with over 15 years of experience."}
             </Typography>
           </Box>
 
@@ -224,7 +228,7 @@ export default function AppointmentModal({
                 />
               )}
 
-              {/* ✅ FIXED BUTTON */}
+             
               <Button
                 variant="contained"
                 onClick={handleSubmit}
@@ -234,7 +238,7 @@ export default function AppointmentModal({
                   height: 48,
                   borderRadius: "12px",
                   backgroundColor: "#000",
-                  color: "#ffffff", // ✅ FIXED TEXT
+                  color: "#ffffff",
                   fontWeight: 600,
                   textTransform: "none",
 
@@ -268,108 +272,3 @@ export default function AppointmentModal({
   );
 }
 
-
-
-// "use client";
-
-// import React, { useState } from "react";
-// import SlotPicker from "./slotPicker";
-// import {
-//   Dialog,
-//   DialogTitle,
-//   DialogContent,
-//   DialogActions,
-//   Button,
-//   TextField,
-//   Stack,
-// } from "@mui/material";
-
-// export default function AppointmentModal({
-//   open,
-//   onClose,
-//   onSubmit,
-//   defaultName = "",
-//   defaultDate = "",
-//   defaultTime = "",
-//   doctorId,
-// }: {
-//   open: boolean;
-//   onClose: () => void;
-//   onSubmit: (payload: { date: string; time: string; name: string }) => void;
-//   defaultName?: string;
-//   defaultDate?: string;
-//   defaultTime?: string;
-//   doctorId?: string | null;
-// }) {
-//   const [date, setDate] = useState<string>(defaultDate || "");
-//   const [time, setTime] = useState<string>(defaultTime || "");
-//   const [name, setName] = useState<string>(defaultName);
-//   const [submitting, setSubmitting] = useState(false);
-
-//   React.useEffect(() => {
-//     if (open) {
-//       setName(defaultName || "");
-//       setDate(defaultDate || "");
-//       setTime(defaultTime || "");
-//     }
-//   }, [open, defaultName, defaultDate, defaultTime]);
-
-//   const handleSubmit = async () => {
-//     if (!date || !time || !name) return;
-//     setSubmitting(true);
-//     try {
-//       await onSubmit({ date, time, name });
-//     } finally {
-//       setSubmitting(false);
-//     }
-//   };
-
-//   return (
-//     <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
-//       <DialogTitle>Book Appointment</DialogTitle>
-//       <DialogContent>
-//         <Stack spacing={2} sx={{ mt: 1 }}>
-//           <TextField
-//             label="Patient name"
-//             value={name}
-//             onChange={(e) => setName(e.target.value)}
-//             fullWidth
-//           />
-
-//           <TextField
-//             label="Date"
-//             type="date"
-//             value={date}
-//             onChange={(e) => setDate(e.target.value)}
-//             InputLabelProps={{ shrink: true }}
-//             fullWidth
-//           />
-
-//             {/* Time selection will be populated from backend slots when date + doctorId are present */}
-//             {doctorId && date ? (
-//               <SlotPicker doctorId={doctorId} date={date} value={time} onChange={(t: string) => setTime(t)} />
-//             ) : (
-//               <TextField
-//                 label="Time"
-//                 type="time"
-//                 value={time}
-//                 onChange={(e) => setTime(e.target.value)}
-//                 InputLabelProps={{ shrink: true }}
-//                 fullWidth
-//               />
-//             )}
-//         </Stack>
-//       </DialogContent>
-//       <DialogActions sx={{ px: 3, py: 2 }}>
-//         <Button onClick={onClose} disabled={submitting}>Cancel</Button>
-//         <Button
-//           variant="contained"
-//           onClick={handleSubmit}
-//           disabled={!date || !time || !name || submitting}
-//         >
-//           {submitting ? "Booking..." : "Confirm Booking"}
-//         </Button>
-//       </DialogActions>
-//     </Dialog>
-//   );
-// }

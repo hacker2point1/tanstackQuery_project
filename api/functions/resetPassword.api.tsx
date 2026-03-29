@@ -8,6 +8,7 @@ export const ResetPasswordFunction = async ({
   password,
   confirm_password,
 }: {
+  //defining the type of the object
   id: string;
   token: string;
   password: string;

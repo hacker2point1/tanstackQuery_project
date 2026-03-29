@@ -60,7 +60,7 @@ const TypewriterText = ({ words }: { words: string[] }) => {
   );
 };
 
-// --- MAIN BANNER COMPONENT ---
+//banner
 const Banner = () => {
   const words = ["care", "healing", "wellness", "comfort", "trust", "hospitality"];
 

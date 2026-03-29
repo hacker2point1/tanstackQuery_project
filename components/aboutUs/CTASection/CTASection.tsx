@@ -2,8 +2,11 @@
 
 import { Box, Container, Typography, Button } from "@mui/material";
 import { motion } from "framer-motion";
+import { useRouter } from "next/navigation";
 
 const CTASection = () => {
+  const router = useRouter();
+
   return (
     <Box
       sx={{
@@ -32,6 +35,7 @@ const CTASection = () => {
               background: "#fff",
               color: "#000",
             }}
+            onClick={() => router.push('/find-doctor')}
           >
             Book Appointment
           </Button>

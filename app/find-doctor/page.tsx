@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import {
   Box,
   Typography,
@@ -9,6 +9,7 @@ import {
   CircularProgress,
   Stack,
   MenuItem,
+  Pagination,
 } from "@mui/material";
 import StarIcon from "@mui/icons-material/Star";
 import LocationOnIcon from "@mui/icons-material/LocationOn";
@@ -44,7 +45,7 @@ function DoctorCard({
       <Box
         sx={{
           height: 220,
-          backgroundImage: `url(${doc.image || "/img/doctor1.jpg"})`,
+          backgroundImage: `url(${doc.assignedImage || "/img/doctor1.jpg"})`,
           backgroundSize: "cover",
           backgroundPosition: "center",
         }}
@@ -125,8 +126,8 @@ export default function FindDoctorPage() {
   const [query, setQuery] = useState("");
   const [debouncedQuery, setDebouncedQuery] = useState("");
   const [department, setDepartment] = useState("All");
-
-  const [visibleCount, setVisibleCount] = useState(6); 
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 6; 
 
   const bookMutation = useDoctorAppoinment();
   const { data: res, isLoading } = useDoctorList({
@@ -142,7 +143,7 @@ export default function FindDoctorPage() {
   }, [query]);
 
   useEffect(() => {
-   
+    setCurrentPage(1);
   }, [debouncedQuery, department]);
 
   const [openModal, setOpenModal] = useState(false);
@@ -178,7 +179,49 @@ export default function FindDoctorPage() {
     return true;
   });
 
-  const visibleDoctors = filteredDoctors.slice(0, visibleCount);
+  // Available doctor images for random assignment
+  const defaultImages = [
+    "/img/doctor1.jpg",
+    "/img/doctor2.jpg",
+    "/img/doctor3.jpg",
+  ];
+
+  // Assign images to doctors, ensuring no consecutive cards have the same image
+  const doctorsWithImages = useMemo(() => {
+    return filteredDoctors.map((doc: any) => {
+      // Use API image if available, otherwise assign from default images
+      if (doc?.image || doc?.img) {
+        return { ...doc, assignedImage: doc.image || doc.img };
+      }
+      
+      // Use a stable identifier (doctor ID) to ensure consistent image assignment
+      const stableId = doc?.id ?? doc?._id ?? doc?.name ?? Math.random();
+      const hash = String(stableId).split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+      return { ...doc, assignedImage: defaultImages[hash % defaultImages.length], stableHash: hash };
+    }).map((doc, index, array) => {
+      // Ensure no consecutive cards have the same image
+      if (doc?.image || doc?.img) return doc; // Skip API images
+      
+      let imageIndex = doc.stableHash % defaultImages.length;
+      
+      // Check if previous doctor has the same image
+      if (index > 0) {
+        const prevImage = array[index - 1].assignedImage;
+        if (prevImage === defaultImages[imageIndex]) {
+          // Use next image to avoid consecutive duplicates
+          imageIndex = (imageIndex + 1) % defaultImages.length;
+        }
+      }
+      
+      return { ...doc, assignedImage: defaultImages[imageIndex] };
+    });
+  }, [filteredDoctors]);
+
+  // Calculate pagination
+  const totalPages = Math.ceil(doctorsWithImages.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const visibleDoctors = doctorsWithImages.slice(startIndex, endIndex);
 
   return (
     <Box sx={{ px: { xs: 2, md: 6 }, py: 6 }}>
@@ -264,40 +307,35 @@ export default function FindDoctorPage() {
           ))}
         </Box>
 
-        {/* view more & view less */}
-        {filteredDoctors.length > 6 && (
-          <Box textAlign="center" mt={5}>
-            {visibleCount < filteredDoctors.length ? (
-              <Button
-                onClick={() => setVisibleCount((prev) => prev + 6)}
-                sx={{
-                  px: 4,
-                  py: 1.2,
-                  borderRadius: "999px",
-                  background: "#0d6e8a",
+        {/* pagination */}
+        {totalPages > 1 && (
+          <Box display="flex" justifyContent="center" mt={6}>
+            <Pagination
+              count={totalPages}
+              page={currentPage}
+              onChange={(event, page) => {
+                setCurrentPage(page);
+                window.scrollTo({ top: 0, behavior: "smooth" });
+              }}
+              color="primary"
+              size="large"
+              sx={{
+                "& .MuiPaginationItem-root": {
+                  color: "#0d6e8a",
+                  borderColor: "#0d6e8a",
+                  "&:hover": {
+                    backgroundColor: "rgba(13, 110, 138, 0.1)",
+                  },
+                },
+                "& .MuiPaginationItem-page.Mui-selected": {
+                  backgroundColor: "#0d6e8a",
                   color: "#fff",
-                  textTransform: "none",
-                  "&:hover": { background: "#094d63" },
-                }}
-              >
-                View More
-              </Button>
-            ) : (
-              <Button
-                onClick={() => setVisibleCount(6)}
-                sx={{
-                  px: 4,
-                  py: 1.2,
-                  borderRadius: "999px",
-                  background: "#6b7280",
-                  color: "#fff",
-                  textTransform: "none",
-                  "&:hover": { background: "#4b5563" },
-                }}
-              >
-                View Less
-              </Button>
-            )}
+                  "&:hover": {
+                    backgroundColor: "#094d63",
+                  },
+                },
+              }}
+            />
           </Box>
         )}
 
@@ -307,6 +345,7 @@ export default function FindDoctorPage() {
           onClose={() => setOpenModal(false)}
           doctorId={selectedDoctorId}
           doctor={selectedDoctor}
+          cardImage={selectedDoctor?.assignedImage}
           onSubmit={async ({ date, time, name }) => {
             if (!selectedDoctorId) return;
 

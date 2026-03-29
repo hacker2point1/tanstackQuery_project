@@ -29,13 +29,13 @@ import AuthSwitcher from "@/components/modals/authSwitcher/authSwitcher";
 import useUserStore from "@/zusStand/store";
 
 export default function Navbar() {
-  const [openSearch, setOpenSearch] = useState(false);
-  const [openLocation, setOpenLocation] = useState(false);
+  const [openSearch, setOpenSearch] = useState(false);  //search modal state
+  const [openLocation, setOpenLocation] = useState(false); //location modal state
   const [openAuth, setOpenAuth] = useState(false);
 
+   //navbar scroll behaviour handeling state
   const [showNavbar, setShowNavbar] = useState(true);
   const [lastScroll, setLastScroll] = useState(0);
-  const [open, setOpen] = useState(false);
 
   // Zustand state
   const { token, logout, initializeToken } = useUserStore();
@@ -167,7 +167,7 @@ export default function Navbar() {
               <SearchIcon />
             </IconButton> */}
 
-            <IconButton color="black" onClick={() => setOpenLocation(true)}>
+            <IconButton color="#000000" onClick={() => setOpenLocation(true)}>
               <LocationOnIcon />
             </IconButton>
 

@@ -92,7 +92,7 @@ const AboutUsBanner = () => {
             health.
           </Typography>
 
-          {/* ✅ ROTATING ARROW BUTTON */}
+          {/*ROTATING ARROW BUTTON */}
           <Button
             component={Link}
             href="/about"

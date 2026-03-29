@@ -13,7 +13,7 @@ const ContactCTA = () => {
         background: "linear-gradient(135deg, #12343b, #0d6e8a)",
         color: "#fff",
 
-        // ✅ apply font globally inside this section
+        // apply font globally inside this section
         fontFamily,
       }}
     >
